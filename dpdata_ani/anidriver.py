@@ -2,9 +2,24 @@ import dpdata
 import torchani
 import torch
 import numpy as np
+from .auto_batch_size import AutoBatchSize
 from torchani.units import hartree2ev
 from dpdata.driver import Driver
 from dpdata.periodic_table import Element
+
+
+def ani_eval(model, device, coords: np.ndarray, species: np.ndarray):
+    nframes = coords.shape[0]
+    natoms = coords.shape[1]
+    species = torch.tensor(species, device=device)
+    coordinates = torch.tensor(coords,
+                    requires_grad=True, device=device, dtype=torch.float32)
+    energy = hartree2ev(model((species, coordinates)).energies)
+    derivative = torch.autograd.grad(energy.sum(), coordinates)[0]
+    force = -derivative
+    energy = energy.cpu().detach().numpy().reshape((nframes, 1))
+    force = force.cpu().detach().numpy().reshape((nframes, natoms, 3))
+    return energy, force
 
 
 @Driver.register("ani")
@@ -15,29 +30,22 @@ class ANIDriver(Driver):
         else:
             self.device = torch.device(device)
         self.model = model.to(self.device)
+        self.auto_batch_size = AutoBatchSize()
 
     def label(self, data):
-        ori_sys = dpdata.System.from_dict({'data': data})
-        labeled_sys = dpdata.LabeledSystem()
+        nframes = data['coords'].shape[0]
+        natoms = data['coords'].shape[1]
+
         atomic_z = np.array([Element(xx).Z for xx in data['atom_names']], dtype=int)
 
-        species = np.array([atomic_z[data['atom_types']]])
-        species = torch.tensor(species, device=self.device)
+        species = np.array(atomic_z[data['atom_types']])
+        species = np.tile(species, (nframes, 1))
 
-        for ss in ori_sys:
-            coordinates = torch.tensor(ss['coords'],
-                            requires_grad=True, device=self.device, dtype=torch.float32)
-            energy = hartree2ev(self.model((species, coordinates)).energies)
-            derivative = torch.autograd.grad(energy.sum(), coordinates)[0]
-            force = -derivative
-    
-            data = ss.data
-            data['energies'] = energy.cpu().detach().numpy().reshape((1, 1))
-            data['forces'] = force.cpu().detach().numpy().reshape((1, ss.get_natoms(), 3))
+        energy, force = self.auto_batch_size.execute_all(ani_eval, nframes, natoms, self.model, self.device, data['coords'], species)
 
-            this_sys = dpdata.LabeledSystem.from_dict({'data': data})
-            labeled_sys.append(this_sys)
-        return labeled_sys.data
+        data['energies'] = energy
+        data['forces'] = force
+        return data
 
 @Driver.register("ani/1x")
 class ANI1xDriver(ANIDriver):
