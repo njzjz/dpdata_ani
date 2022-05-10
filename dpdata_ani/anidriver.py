@@ -47,7 +47,20 @@ class ANIDriver(Driver):
         data['forces'] = force
         return data
 
+
 @Driver.register("ani/1x")
 class ANI1xDriver(ANIDriver):
     def __init__(self, device: str=None):
         ANIDriver.__init__(self, torchani.models.ANI1x(periodic_table_index=True), device=device)
+
+
+@Driver.register("ani/1ccx")
+class ANI1xDriver(ANIDriver):
+    def __init__(self, device: str=None):
+        ANIDriver.__init__(self, torchani.models.ANI1ccx(periodic_table_index=True), device=device)
+
+
+@Driver.register("ani/2x")
+class ANI1xDriver(ANIDriver):
+    def __init__(self, device: str=None):
+        ANIDriver.__init__(self, torchani.models.ANI2x(periodic_table_index=True), device=device)
