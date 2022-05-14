@@ -1,5 +1,6 @@
 import dpdata
 import requests
+import pytest
 
 
 @pytest.mark.skip(reason="it consumes too much memory")
