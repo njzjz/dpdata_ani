@@ -11,7 +11,6 @@ setup(
     ],
     extras_require = {
         "test": [
-            "requests",
             "pytest",
             "pytest-cov",
         ],
