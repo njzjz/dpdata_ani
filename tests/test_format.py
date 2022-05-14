@@ -2,6 +2,7 @@ import dpdata
 import requests
 
 
+@pytest.mark.skip(reason="it consumes too much memory")
 def test_load_ani1x(tmp_path):
     # download ani1x to fn
     url = "https://figshare.com/ndownloader/files/18112775"
