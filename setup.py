@@ -19,6 +19,7 @@ setup(
         'dpdata.plugins': [
             'anidriver=dpdata_ani.anidriver:ANIDriver',
             'ani1xload=dpdata_ani.ani1x:ANI1xFormat',
+            'comp6load=dpdata_ani.comp6:COMP6Format',
         ]
     },
     packages = ['dpdata_ani'],
