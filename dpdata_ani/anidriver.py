@@ -17,7 +17,7 @@ def ani_eval(model, device, coords: np.ndarray, species: np.ndarray):
     energy = hartree2ev(model((species, coordinates)).energies)
     derivative = torch.autograd.grad(energy.sum(), coordinates)[0]
     force = -derivative
-    energy = energy.cpu().detach().numpy().reshape((nframes, 1))
+    energy = energy.cpu().detach().numpy().reshape((nframes,))
     force = force.cpu().detach().numpy().reshape((nframes, natoms, 3))
     return energy, force
 
