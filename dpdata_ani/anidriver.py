@@ -55,12 +55,12 @@ class ANI1xDriver(ANIDriver):
 
 
 @Driver.register("ani/1ccx")
-class ANI1xDriver(ANIDriver):
+class ANI1ccxDriver(ANIDriver):
     def __init__(self, device: str=None):
         ANIDriver.__init__(self, torchani.models.ANI1ccx(periodic_table_index=True), device=device)
 
 
 @Driver.register("ani/2x")
-class ANI1xDriver(ANIDriver):
+class ANI2xDriver(ANIDriver):
     def __init__(self, device: str=None):
         ANIDriver.__init__(self, torchani.models.ANI2x(periodic_table_index=True), device=device)
