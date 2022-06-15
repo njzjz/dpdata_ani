@@ -1,14 +1,14 @@
 import dpdata
-import torchani
-import torch
 import numpy as np
 from .auto_batch_size import AutoBatchSize
-from torchani.units import hartree2ev
 from dpdata.driver import Driver
 from dpdata.periodic_table import Element
 
 
 def ani_eval(model, device, coords: np.ndarray, species: np.ndarray):
+    import torch
+    from torchani.units import hartree2ev
+
     nframes = coords.shape[0]
     natoms = coords.shape[1]
     species = torch.tensor(species, device=device)
@@ -25,6 +25,8 @@ def ani_eval(model, device, coords: np.ndarray, species: np.ndarray):
 @Driver.register("ani")
 class ANIDriver(Driver):
     def __init__(self, model, device: str=None):
+        import torch
+
         if device is None:
             self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         else:
@@ -51,16 +53,22 @@ class ANIDriver(Driver):
 @Driver.register("ani/1x")
 class ANI1xDriver(ANIDriver):
     def __init__(self, device: str=None, model_index: int=None):
+        import torchani
+
         ANIDriver.__init__(self, torchani.models.ANI1x(periodic_table_index=True, model_index=model_index), device=device)
 
 
 @Driver.register("ani/1ccx")
 class ANI1ccxDriver(ANIDriver):
     def __init__(self, device: str=None, model_index: int=None):
+        import torchani
+
         ANIDriver.__init__(self, torchani.models.ANI1ccx(periodic_table_index=True, model_index=model_index), device=device)
 
 
 @Driver.register("ani/2x")
 class ANI2xDriver(ANIDriver):
     def __init__(self, device: str=None, model_index: int=None):
+        import torchani
+
         ANIDriver.__init__(self, torchani.models.ANI2x(periodic_table_index=True, model_index=model_index), device=device)
