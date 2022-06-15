@@ -10,7 +10,7 @@ The [dpdata](https://github.com/deepmodeling/dpdata) plugin for ANI.
 ## Installation
 
 ```sh
-pip install git+https://github.com/njzjz/dpdata_ani
+pip install dpdata-ani
 ```
 
 ## Usage
