@@ -3,7 +3,7 @@ setup(
     name="dpdata-ani",
     version="0.0.1",
     install_requires = [
-        "dpdata @ git+https://github.com/deepmodeling/dpdata@devel", # 0.2.7
+        "dpdata >=0.2.7",
         "torchani",
         "torch",
         "numpy",
