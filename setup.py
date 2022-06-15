@@ -1,7 +1,7 @@
 from setuptools import setup
 setup(
     name="dpdata-ani",
-    version="0.0.1",
+    version="0.0.2",
     install_requires = [
         "dpdata >=0.2.7",
         "torchani",
