@@ -94,7 +94,6 @@ def read_output(output: str) -> Tuple[float, np.ndarray]:
 
     energy = None
     forces = None
-    print(output)
     for line in output.splitlines():
         if 'SCF TOTAL ENERGY' in line:
             # eV
