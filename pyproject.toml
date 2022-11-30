@@ -33,5 +33,6 @@ test = [
 anidriver = "dpdata_ani.anidriver:ANIDriver"
 ani1xload = "dpdata_ani.ani1x:ANI1xFormat"
 comp6load = "dpdata_ani.comp6:COMP6Format"
+odm2driver = "dpdata_ani.odm2:ODM2Driver"
 
 [tool.setuptools_scm]
