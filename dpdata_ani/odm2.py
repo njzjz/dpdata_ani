@@ -11,6 +11,9 @@ unitconv = dpdata.unit.EnergyConversion("kcal_mol", "eV").value()
 
 @Driver.register("mndo/odm2")
 class ODM2Driver(Driver):
+    def __init__(self, charge: int = 0) -> None:
+        self.charge = charge
+
     def label(self, data):
         nframes = data['coords'].shape[0]
 
@@ -21,7 +24,7 @@ class ODM2Driver(Driver):
         energies = []
         forces = []
         for ii in range(nframes):
-            out = run_odm2_calculation(species, data['coords'][ii])
+            out = run_odm2_calculation(species, data['coords'][ii], charge=self.charge)
             energy, force = read_output(out)
             if energy is None or force is None:
                 raise RuntimeError("Unconverage calculation")
@@ -32,7 +35,7 @@ class ODM2Driver(Driver):
         data['forces'] = np.array(forces)
         return data
 
-def run_odm2_calculation(numbers: np.ndarray, coordinates: np.ndarray) -> str:
+def run_odm2_calculation(numbers: np.ndarray, coordinates: np.ndarray, charge=0) -> str:
     """Run an ODM2 calculation.
     
     Parameters
@@ -53,7 +56,7 @@ def run_odm2_calculation(numbers: np.ndarray, coordinates: np.ndarray) -> str:
     buff.append('iop=-22 igeom=1 iform=1 immdp=-1 +')
     buff.append('icuts=-1 icutg=-1 kitscf=9999 iscf=9 iplscf=9 +')
     buff.append('iprint=-1 kprint=-5 lprint=-2 mprint=0 jprint=-1 +')
-    buff.append('kharge=0 imult=0 nprint=-1\n\n')
+    buff.append('kharge=%d imult=0 nprint=-1\n\n' % charge)
     for j in range(len(numbers)):
         buff.append('%2s     %12.8f %3d     %12.8f %3d     %12.8f %3d' %(
             numbers[j],
