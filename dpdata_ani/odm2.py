@@ -27,7 +27,8 @@ class ODM2Driver(Driver):
             out = run_odm2_calculation(species, data['coords'][ii], charge=self.charge)
             energy, force = read_output(out)
             if energy is None or force is None:
-                raise RuntimeError("Unconverage calculation")
+                energy = np.nan
+                force = np.full([species.size ,3], np.nan)
             energies.append(energy)
             forces.append(force)
 
