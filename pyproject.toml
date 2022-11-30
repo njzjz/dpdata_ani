@@ -23,6 +23,12 @@ readme = "README.md"
 [project.urls]
 Homepage = "https://github.com/njzjz/dpdata_ani"
 
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+]
+
 [project.entry-points."dpdata.plugins"]
 anidriver = "dpdata_ani.anidriver:ANIDriver"
 ani1xload = "dpdata_ani.ani1x:ANI1xFormat"
