@@ -80,3 +80,11 @@ class QDPiDriver(Driver.get_driver("hybrid")):
             {'type': 'mndo/odm2', 'charge': charge},
             {'type': 'dftd4', 'method': 'wb97x'},
             ])
+
+    @property
+    def charge(self):
+        return self.drivers[1].charge
+
+    @charge.setter
+    def charge(self, charge: int = 0) -> None:
+        self.drivers[1].charge = charge
