@@ -24,6 +24,10 @@ readme = "README.md"
 Homepage = "https://github.com/njzjz/dpdata_ani"
 
 [project.optional-dependencies]
+aiqm1 = [
+    "MLatom",
+    "dftd4",
+]
 test = [
     "pytest",
     "pytest-cov",
@@ -34,5 +38,8 @@ anidriver = "dpdata_ani.anidriver:ANIDriver"
 ani1xload = "dpdata_ani.ani1x:ANI1xFormat"
 comp6load = "dpdata_ani.comp6:COMP6Format"
 odm2driver = "dpdata_ani.odm2:ODM2Driver"
+dftd4 = "dpdata_ani.dftd4:DFTD4Driver"
+aiqm1nn = "dpdata_ani.aiqm1:AIQM1NNDriver"
+aiqm1 = "dpdata_ani.aiqm1:AIQM1Driver"
 
 [tool.setuptools_scm]
