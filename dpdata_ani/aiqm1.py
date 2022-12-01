@@ -72,8 +72,8 @@ class AIQM1NNDriver(ANIDriver):
 
 
 @Driver.register('aiqm1')
-class QDPiDriver(Driver.get_driver("hybrid")):
-    """QDPi."""
+class AIQM1Driver(Driver.get_driver("hybrid")):
+    """AIQM1."""
     def __init__(self, charge: int = 0, model_index: int = 0) -> None:
         super().__init__([
             {'type': 'aiqm1/nn', 'model_index': model_index},
