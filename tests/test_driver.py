@@ -15,3 +15,4 @@ def test_ani_driver():
     ls = s.predict(driver="ani/1x")
     assert ls.get_natoms() == 1
     assert ls.get_nframes() == 1
+    ls.check_data()
