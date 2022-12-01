@@ -48,6 +48,7 @@ class AIQM1NNDriver(ANIDriver):
         super().__init__(aiqm1.models[0], device=device)
 
     def label(self, data):
+        from torchani.units import hartree2ev
         nframes = data['coords'].shape[0]
         natoms = data['coords'].shape[1]
 
@@ -64,7 +65,7 @@ class AIQM1NNDriver(ANIDriver):
 
         energy, force = self.auto_batch_size.execute_all(ani_eval, nframes, natoms, self.model, self.device, data['coords'], species)
         
-        bias = np.sum(self.sae[species])
+        bias = hartree2ev(np.sum(self.sae[species]))
 
         data['energies'] = energy + bias
         data['forces'] = force
