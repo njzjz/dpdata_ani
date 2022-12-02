@@ -1,7 +1,10 @@
 import logging
+import os
 from typing import Callable, Tuple
 
 import numpy as np
+
+log = logging.getLogger(__name__)
 
 
 class AutoBatchSize:
@@ -10,7 +13,11 @@ class AutoBatchSize:
     
     Notes
     -----
-    We assume all OOM error will raise :metd:`OutOfMemoryError`.
+    In some CPU environments, the program may be directly killed when OOM. In
+    this case, by default the batch size will not be increased for CPUs. The
+    environment variable `DP_INFER_BATCH_SIZE` can be set as the batch size.
+
+    In other cases, we assume all OOM error will raise :class:`OutOfMemoryError`.
 
     Parameters
     ----------
@@ -29,11 +36,27 @@ class AutoBatchSize:
         minimal not working batch size
     """
     def __init__(self, initial_batch_size: int = 1024, factor: float = 2.) -> None:
+        import torch
         # See also PyTorchLightning/pytorch-lightning#1638
         # TODO: discuss a proper initial batch size
         self.current_batch_size = initial_batch_size
-        self.maximum_working_batch_size = 0
+        DP_INFER_BATCH_SIZE = int(os.environ.get('DP_INFER_BATCH_SIZE', 0))
         self.minimal_not_working_batch_size = 2**31
+        if DP_INFER_BATCH_SIZE > 0:
+            self.current_batch_size = DP_INFER_BATCH_SIZE
+            self.maximum_working_batch_size = DP_INFER_BATCH_SIZE
+            self.minimal_not_working_batch_size = self.maximum_working_batch_size + 1
+        else:
+            self.maximum_working_batch_size = initial_batch_size
+            if torch.cuda.is_available():
+                self.minimal_not_working_batch_size = 2**31
+            else:
+                self.minimal_not_working_batch_size = self.maximum_working_batch_size + 1
+                log.warning(
+                    "You can use the environment variable DP_INFER_BATCH_SIZE to"
+                    "control the inference batch size (nframes * natoms). "
+                    "The default value is %d." % initial_batch_size
+                )
         self.factor = factor
 
     def execute(self, callable: Callable, start_index: int, natoms: int) -> Tuple[int, tuple]:
@@ -70,7 +93,7 @@ class AutoBatchSize:
             if self.maximum_working_batch_size >= self.minimal_not_working_batch_size:
                 self.maximum_working_batch_size = int(self.minimal_not_working_batch_size / self.factor)
             if self.minimal_not_working_batch_size <= natoms:
-                raise OutOfMemoryError("The callable still throws an out-of-memory (OOM) error even when batch size is 1!") from e
+                raise RuntimeError("The callable still throws an out-of-memory (OOM) error even when batch size is 1!") from e
             # adjust the next batch size
             self._adjust_batch_size(1./self.factor)
             return 0, None
@@ -85,7 +108,7 @@ class AutoBatchSize:
     def _adjust_batch_size(self, factor: float):
         old_batch_size = self.current_batch_size
         self.current_batch_size = int(self.current_batch_size * factor)
-        logging.info("Adjust batch size from %d to %d" % (old_batch_size, self.current_batch_size))
+        log.info("Adjust batch size from %d to %d" % (old_batch_size, self.current_batch_size))
 
     def execute_all(self, callable: Callable, total_size: int, natoms: int, *args, **kwargs) -> Tuple[np.ndarray]:
         """Excuate a method with all given data. 
