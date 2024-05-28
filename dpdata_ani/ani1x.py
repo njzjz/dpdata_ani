@@ -1,4 +1,3 @@
-import h5py
 import numpy as np
 import dpdata
 from dpdata.format import Format
@@ -35,6 +34,8 @@ class ANI1xFormat(Format):
         hdf_file : str
             ANI-1x HDF5 file
         """
+        import h5py
+
         with h5py.File(hdf_file, 'r') as f:
             for key in f.keys():
                 yield f[key]
