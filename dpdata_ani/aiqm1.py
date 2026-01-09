@@ -30,7 +30,10 @@ class AIQM1NNDriver(ANIDriver):
         sys.modules['stopper'] = 0
         os.environ['mndobin'] = 'mndo'
         os.environ['dftd4bin'] = 'dftd4'
-        from MLatom.AIQM1 import AIQM1Cls
+        try:
+            from mlatom.aiqm1 import aiqm1 as AIQM1Cls
+        except ModuleNotFoundError:
+            from MLatom.AIQM1 import AIQM1Cls
 
         aiqm1 = AIQM1Cls([
             type,
